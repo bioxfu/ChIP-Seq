@@ -1,0 +1,11 @@
+SampleID,Factor,Treatment,Replicate,bamReads,ControlID,bamControl,Peaks,PeakCaller
+A_H3K4me3,H3K4me3,A,1,bam/A_H3K4me3.bam,Input,bam/Input.bam,$PEAK/A_H3K4me3_peaks.bed,bed
+B_H3K4me3,H3K4me3,B,1,bam/B_H3K4me3.bam,Input,bam/Input.bam,$PEAK/B_H3K4me3_peaks.bed,bed
+C_H3K4me3,H3K4me3,C,1,bam/C_H3K4me3.bam,Input,bam/Input.bam,$PEAK/C_H3K4me3_peaks.bed,bed
+D_H3K4me3,H3K4me3,D,1,bam/D_H3K4me3.bam,Input,bam/Input.bam,$PEAK/D_H3K4me3_peaks.bed,bed
+E_H3K4me3,H3K4me3,E,1,bam/E_H3K4me3.bam,Input,bam/Input.bam,$PEAK/E_H3K4me3_peaks.bed,bed
+A_H3K9me3,H3K9me3,A,1,bam/A_H3K9me3.bam,Input,bam/Input.bam,$PEAK/A_H3K9me3_peaks.bed,bed
+B_H3K9me3,H3K9me3,B,1,bam/B_H3K9me3.bam,Input,bam/Input.bam,$PEAK/B_H3K9me3_peaks.bed,bed
+C_H3K9me3,H3K9me3,C,1,bam/C_H3K9me3.bam,Input,bam/Input.bam,$PEAK/C_H3K9me3_peaks.bed,bed
+D_H3K9me3,H3K9me3,D,1,bam/D_H3K9me3.bam,Input,bam/Input.bam,$PEAK/D_H3K9me3_peaks.bed,bed
+E_H3K9me3,H3K9me3,E,1,bam/E_H3K9me3.bam,Input,bam/Input.bam,$PEAK/E_H3K9me3_peaks.bed,bed

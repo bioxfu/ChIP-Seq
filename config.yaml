@@ -1,0 +1,108 @@
+species: Brachypodium distachyon
+
+seq_info:
+  type: ChIP-Seq (histone modification)
+  mode: PE
+  replicate: 1
+
+path: /var/data/raw_data/CZQ_ChIP_11sam_1rep/fastq
+
+samples:
+  - A_H3K4me3
+  - B_H3K4me3
+  - C_H3K4me3
+  - D_H3K4me3
+  - E_H3K4me3
+  - A_H3K9me3
+  - B_H3K9me3
+  - C_H3K9me3
+  - D_H3K9me3
+  - E_H3K9me3
+  - Input
+
+treat:
+  - A_H3K4me3
+  - B_H3K4me3
+  - C_H3K4me3
+  - D_H3K4me3
+  - E_H3K4me3
+  - A_H3K9me3
+  - B_H3K9me3
+  - C_H3K9me3
+  - D_H3K9me3
+  - E_H3K9me3
+
+control: Input
+
+sample_info:
+  A: 22C
+  B: 37C
+  C: 22C
+  D: 45C
+  E: 45C
+
+peak1: 
+  - A_H3K4me3
+  - A_H3K4me3
+  - A_H3K4me3
+  - A_H3K4me3
+  - B_H3K4me3
+  - B_H3K4me3
+  - B_H3K4me3
+  - C_H3K4me3
+  - C_H3K4me3
+  - D_H3K4me3
+  - A_H3K9me3
+  - A_H3K9me3
+  - A_H3K9me3
+  - A_H3K9me3
+  - B_H3K9me3
+  - B_H3K9me3
+  - B_H3K9me3
+  - C_H3K9me3
+  - C_H3K9me3
+  - D_H3K9me3
+
+peak2:
+  - B_H3K4me3
+  - C_H3K4me3
+  - D_H3K4me3
+  - E_H3K4me3
+  - C_H3K4me3
+  - D_H3K4me3
+  - E_H3K4me3
+  - D_H3K4me3
+  - E_H3K4me3
+  - E_H3K4me3
+  - B_H3K9me3
+  - C_H3K9me3
+  - D_H3K9me3
+  - E_H3K9me3
+  - C_H3K9me3
+  - D_H3K9me3
+  - E_H3K9me3
+  - D_H3K9me3
+  - E_H3K9me3
+  - E_H3K9me3
+
+index: /home/xfu/Gmatic6/genome/Bdi_v1.0/Bdi
+
+txdb: /home/xfu/Gmatic6/gene/Bdi_v1.0/Bdi_txdb.sqlite
+
+gene2go: /home/xfu/Gmatic6/gene/Bdi_v1.0/Bdi_gene2GOterm.tsv
+
+cpu: 30
+
+adapter: /home/xfu/miniconda2/envs/gmatic/share/trimmomatic/adapters/TruSeq3-PE-2.fa
+
+insert: 1000
+
+IGV: /home/xfu/igv/genomes/Bdi.genome
+
+gsize: 271148425
+
+p: 1e-2
+
+olp.mask: H3K9me3:A,B,C,D^H3K9me3:A,B,C,E^H3K9me3:D,E^H3K4me3:A,B,C,D^H3K4me3:A,B,C,E^H3K4me3:D,E
+
+diff.mask: H3K9me3,H3K4me3:A,B,C,D,E
