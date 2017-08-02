@@ -1,0 +1,15 @@
+*Rhistory
+.snakemake/
+MAnorm/
+RData/
+bam/
+clean/
+fastqc/
+figure/
+peak_1e-2/
+peak_1e-5/
+sample_sheet_peak_1e-2.csv
+sample_sheet_peak_1e-5.csv
+table/
+track/
+
