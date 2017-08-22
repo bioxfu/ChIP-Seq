@@ -19,6 +19,7 @@ dependencies:
 - bioconductor-chipseeker=1.10.0=r3.3.2_0
 - bioconductor-deseq2=1.14.1=r3.3.2_0
 - bioconductor-diffbind=1.16.3=0
+- bioconductor-dnacopy=1.48.0=r3.3.2_0
 - bioconductor-do.db=2.9=r3.3.2_0
 - bioconductor-dose=2.10.7=r3.3.2_0
 - bioconductor-edger=3.16.5=r3.3.2_0
@@ -35,6 +36,8 @@ dependencies:
 - bioconductor-gseabase=1.34.1=r3.3.2_0
 - bioconductor-iranges=2.8.2=r3.3.2_0
 - bioconductor-limma=3.30.13=r3.3.2_0
+- bioconductor-medips=1.24.0=r3.3.2_0
+- bioconductor-preprocesscore=1.34.0=r3.3.2_0
 - bioconductor-qvalue=2.6.0=r3.3.2_0
 - bioconductor-rbgl=1.48.1=r3.3.2_1
 - bioconductor-rsamtools=1.26.1=r3.3.2_0
@@ -55,6 +58,7 @@ dependencies:
 - fastqc=0.11.5=pl5.22.0_2
 - filechunkio=1.6=py36_0
 - ftputil=3.2=py36_0
+- gfold=1.1.4=gsl1.16_1
 - hisat2=2.1.0=py36pl5.22.0_0
 - htslib=1.5=0
 - igvtools=2.3.93=0
@@ -119,7 +123,7 @@ dependencies:
 - glib=2.51.4=0
 - gmp=6.1.2=0
 - graphite2=1.3.9=0
-- gsl=2.1=2
+- gsl=1.16=0
 - gst-plugins-base=1.8.0=0
 - gstreamer=1.8.0=2
 - harfbuzz=1.4.3=0
