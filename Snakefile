@@ -4,11 +4,13 @@ rule all:
 	input:
 		expand('fastqc/{sample}_R1_fastqc.html', sample=config['samples']),
 		expand('fastqc/{sample}_R2_fastqc.html', sample=config['samples']),
+		expand('fastqc/total_reads.tsv', sample=config['samples']),		
 		expand('clean/{sample}_R1_paired.fastq.gz', sample=config['samples']),
 		expand('clean/{sample}_R2_paired.fastq.gz', sample=config['samples']),
 		expand('bam/{sample}.bam', sample=config['samples']),
 		expand('bam/{sample}.bam.bai', sample=config['samples']),
 		expand('bam/{sample}.bamqc', sample=config['samples']),
+		expand('bam/total_mapped_reads.tsv', sample=config['samples']),		
 		expand('track/{sample}.tdf', sample=config['samples']),
 		expand('peak_{p}/{treat}_peaks.bed', treat=config['treat'], p=config['p']),
 		expand('peak_{p}/{treat}_peaks.xls', treat=config['treat'], p=config['p']),
@@ -37,6 +39,15 @@ rule fastqc:
 		'fastqc/{sample}_R2_fastqc.html'
 	shell:
 		'fastqc -t 2 -o fastqc {input}'
+
+rule total_reads:
+	input:
+		['fastqc/{sample}_R1_fastqc.html'.format(sample=x) for x in config['samples']],
+		['fastqc/{sample}_R2_fastqc.html'.format(sample=x) for x in config['samples']]
+	output:
+		'fastqc/total_reads.tsv'
+	shell:
+		"cat fastqc/*.html|grep 'Filename'|sed -r 's/.+Filename<\/td><td>//'|sed -r 's/<\/td><\/tr><tr><td>Sequences flagged.+//'|sed -r 's/<.+>/\t/'|sort > {output}"
 
 rule trimmomatic:
 	input:
@@ -82,6 +93,16 @@ rule bam_qc:
 		cpu = config['cpu']
 	shell:
 		"qualimap bamqc --java-mem-size=10G -nt {params.cpu} -bam {input.bam} -outdir {output.bamqc}"
+
+rule total_mapped_reads:
+	input:
+		['bam/{sample}.bamqc'.format(sample=x) for x in config['samples']]
+	output:
+		'bam/total_mapped_reads.tsv'
+	shell:
+		"cat bam/*.bamqc/*genome_results.txt|grep 'bam file'|sed -r 's/.+= //'|sed 's/bam\///' > tmp1 && \
+		cat bam/*.bamqc/*genome_results.txt|grep 'number of mapped reads'|sed -r 's/.+= //'|sed -r 's/ .+//'|sed 's/,//g' > tmp2 && \
+		paste tmp1 tmp2|sort > {output} && rm tmp1 tmp2"
 
 rule bam2bed:
 	input:
