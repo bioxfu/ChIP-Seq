@@ -1,29 +1,18 @@
 species: Arabidopsis thaliana
 
 seq_info:
-  type: ChIP-Seq (EBS protein)
+  type: ChIP-Seq (LEC1 protein)
   mode: PE
-  replicate: 3
+  replicate: 1
 
-path: /var/data/raw_data/HYH_EBS2_ChIP_PE_2sam_3rep/fastq
+path: /home/xfu/Project/HYH/LEC1/ChIP-Seq/fastq/
 
 samples:
-  - EBS-1.chip
-  - EBS-2.chip
-  - EBS-3.chip
-  - EBS-1.input
-  - EBS-2.input
-  - EBS-3.input
+  - L1-1_ChIP
+  - L1-1_input
 
 treat:
-  - EBS-1
-  - EBS-2
-  - EBS-3
-
-sample_info:
-  EBS-1: EBS.2-1
-  EBS-2: EBS.2-5-1
-  EBS-3: EBS.2-5-2
+  - L1-1
 
 peak1:
   - .
@@ -33,9 +22,11 @@ peak2:
 
 index: /home/xfu/Gmatic5/genome/tair10/tair10
 
+Rscript_path: /home/xfu/R/3.2.4/bin/Rscript
+
 txdb: /home/xfu/Gmatic6/gene/tair10/tair10_txdb.sqlite
 
-gene2go: /home/xfu/Gmatic6/gene/tair10/tair10_gene2GOterm.tsv
+gene_anno: /home/xfu/Gmatic5/genome/tair10/tair10_gene_anno.tsv
 
 cpu: 30
 

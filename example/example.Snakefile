@@ -14,8 +14,8 @@ rule all:
 		expand('track/{sample}.tdf', sample=config['samples']),
 		expand('peak_{p}/{treat}_peaks.bed', treat=config['treat'], p=config['p']),
 		expand('peak_{p}/{treat}_peaks.xls', treat=config['treat'], p=config['p']),
-		#expand('peak_{p}/{treat}_peaks_anno.xls', treat=config['treat'], p=config['p']),
-		#expand('peak_{p}/{treat}_peaks_annoPie.pdf', treat=config['treat'], p=config['p']),
+		expand('peak_{p}/{treat}_peaks_anno.xls', treat=config['treat'], p=config['p']),
+		expand('peak_{p}/{treat}_peaks_annoPie.pdf', treat=config['treat'], p=config['p']),
 		#expand('figure/peak_{p}_correlation_heatmap_peak_score.pdf', p=config['p']),
 		#expand('figure/peak_{p}_correlation_heatmap_read_count.pdf', p=config['p']),
 		#expand('figure/peak_{p}_PCA.pdf', p=config['p']),
@@ -142,8 +142,8 @@ rule bedgraph2tdf:
 
 rule macs14:
 	input:
-		treat = 'bam/{treat}.chip.bam',
-		control = 'bam/{treat}.input.bam'
+		treat = 'bam/{treat}_ChIP.bam',
+		control = 'bam/{treat}_input.bam'
 	output:
 		bed = 'peak_{p}/{treat}_peaks.bed',
 		xls = 'peak_{p}/{treat}_peaks.xls'
@@ -162,9 +162,10 @@ rule peak_anno:
 		pie = 'peak_{p}/{treat}_peaks_annoPie.pdf'
 	params:
 		txdb = config['txdb'],
-		gene2go = config['gene2go']
+		gene_anno = config['gene_anno'],
+		Rscript = config['Rscript_path']
 	shell:
-		"Rscript script/peak_anno.R {input} {params} {output}"	
+		"{params.Rscript} script/peak_anno.R {input} {params.txdb} {params.gene_anno} {output}"	
 
 rule load_data_QC:
 	input:
@@ -210,7 +211,7 @@ rule diff_test_anno:
 		xlsx = 'table/peak_{p}_diff_test_anno.xlsx',
 	params:
 		txdb = config['txdb'],
-		gene2go = config['gene2go']
+		gene_anno = config['gene_anno']
 	shell:
 		'Rscript script/diff_test_anno.R {input} {params.txdb} {params.gene2go} {output.RData} {output.xlsx}'
 
@@ -234,7 +235,7 @@ rule MAnorm_anno:
 		'MAnorm/{peak1}_vs_{peak2}_{p}/_all_peak_MAvalues.annoPie.pdf'
 	params:
 		txdb = config['txdb'],
-		gene2go = config['gene2go']
+		gene_anno = config['gene_anno']
 	shell:
 		"Rscript script/peak_anno.R {input} {params} {output}"	
 
