@@ -22,6 +22,10 @@ peak2:
 
 index: /home/xfu/Gmatic5/genome/tair10/tair10
 
+chromSize: /home/xfu/Gmatic5/genome/tair10/tair10.chromSize
+
+gene_bed: /home/xfu/Gmatic5/genome/tair10/tair10_gene.bed
+
 Rscript_path: /home/xfu/R/3.2.4/bin/Rscript
 
 txdb: /home/xfu/Gmatic6/gene/tair10/tair10_txdb.sqlite

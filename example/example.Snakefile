@@ -12,10 +12,16 @@ rule all:
 		expand('bam/{sample}.bamqc', sample=config['samples']),
 		expand('bam/total_mapped_reads.tsv', sample=config['samples']),		
 		expand('track/{sample}.tdf', sample=config['samples']),
+		expand('track/{sample}.bw', sample=config['samples']),
+		expand('matrix/{samples}_gene1K.gz', samples=config['samples']),
+		expand('figure/{samples}_gene1K_profile.png', samples=config['samples']),
+		expand('matrix/{samples}_gene1K_profile.tab', samples=config['samples']),
+		expand('figure/{treat}_gene1K_profile.pdf', treat=config['treat']),
 		expand('peak_{p}/{treat}_peaks.bed', treat=config['treat'], p=config['p']),
 		expand('peak_{p}/{treat}_peaks.xls', treat=config['treat'], p=config['p']),
 		expand('peak_{p}/{treat}_peaks_anno.xls', treat=config['treat'], p=config['p']),
 		expand('peak_{p}/{treat}_peaks_annoPie.pdf', treat=config['treat'], p=config['p']),
+		expand('figure/{treat}_peak_{p}_targets_H3K27me3_overlap.pdf', treat=config['treat'], p=config['p']),
 		#expand('figure/peak_{p}_correlation_heatmap_peak_score.pdf', p=config['p']),
 		#expand('figure/peak_{p}_correlation_heatmap_read_count.pdf', p=config['p']),
 		#expand('figure/peak_{p}_PCA.pdf', p=config['p']),
@@ -140,6 +146,47 @@ rule bedgraph2tdf:
 	shell:
 		"igvtools toTDF {input.bg} {output.tdf} {params.IGV}"
 
+rule bedgraph2bw:
+	input:
+		bg = 'track/{sample}.bedgraph'
+	output:
+		bw = 'track/{sample}.bw'
+	params:
+		chromSize = config['chromSize']
+	shell:
+		"wigToBigWig {input} {params.chromSize} {output}"
+
+rule computeMatrix:
+	input:
+		bw = 'track/{samples}.bw'
+	output:
+		mat = 'matrix/{samples}_gene1K.gz'
+	params:
+		gene_bed = config['gene_bed']
+	shell:
+		"computeMatrix scale-regions -m 1000 -b 1000 -a 1000 -R {params} -S {input} --skipZeros -p 30 -o {output}"
+
+rule plotProfile:
+	input:
+		mat = 'matrix/{samples}_gene1K.gz'
+	output:
+		fig = 'figure/{samples}_gene1K_profile.png',
+		tab = 'matrix/{samples}_gene1K_profile.tab'
+	shell:
+		"plotProfile -m {input.mat} --perGroup --yAxisLabel 'Normalized read coverage' --colors darkred -out {output.fig} --outFileNameData {output.tab}"
+
+rule plotProfile_R:
+	input:
+		chip_sample = 'matrix/{treat}_ChIP_gene1K_profile.tab',
+		input_sample = 'matrix/{treat}_input_gene1K_profile.tab'
+	output:
+		fig = 'figure/{treat}_gene1K_profile.pdf'
+	params:
+		Rscript = config['Rscript_path']
+	shell:
+		"{params.Rscript} script/plotProfile.R {input.chip_sample} {input.input_sample} {output.fig}"
+
+
 rule macs14:
 	input:
 		treat = 'bam/{treat}_ChIP.bam',
@@ -166,6 +213,16 @@ rule peak_anno:
 		Rscript = config['Rscript_path']
 	shell:
 		"{params.Rscript} script/peak_anno.R {input} {params.txdb} {params.gene_anno} {output}"	
+
+rule gene_overlap:
+	input:
+		xls = 'peak_{p}/{treat}_peaks_anno.xls'
+	output:
+		olp = 'figure/{treat}_peak_{p}_targets_H3K27me3_overlap.pdf'
+	params:
+		Rscript = config['Rscript_path']
+	shell:
+		"{params.Rscript} script/gene_overlap_H3K27me3.R {input} {output}"	
 
 rule load_data_QC:
 	input:

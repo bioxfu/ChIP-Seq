@@ -12,4 +12,10 @@ sample_sheet_peak_1e-2.csv
 sample_sheet_peak_1e-5.csv
 table/
 track/
+Snakefile
+config.yaml
+fastq/
+igv.log
+matrix/
+nohup.log
 
