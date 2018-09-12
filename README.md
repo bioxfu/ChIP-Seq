@@ -28,20 +28,23 @@ DATAPATH=/the/path/of/the/raw/data/on/HPC
 
 ### 4. Rename the raw data
 ```
+# if one sample has one run, rename the run
 # dry run to check if mv command is correct
 ./script/rename_rawdata.sh --dry-run
-
 # then do it 
 ./script/rename_rawdata.sh
+
+# if one sample has multiple runs, combine the runs
+./script/rename_and_combine_rawdata.sh
 ```
 
 ### 5. Create *config.yaml* and *Snakefile* based on the examples
 ```
-cp example/example.HPC.plant.config.yaml config.yaml
-cp example/example.plant.Snakefile Snakefile
-cp example/example_design_table.tsv design_table.tsv
+cp example/example_config.yaml config.yaml
+cp example/example_Snakefile Snakefile
+cp example/example_sample_sheet.csv sample_sheet.csv
 
-# edit config.yaml and design_table.tsv
+# edit config.yaml and sample_sheet.csv 
 ```
 
 ### 6. Initiate the project
