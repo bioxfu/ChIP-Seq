@@ -24,6 +24,12 @@ DATAPATH=/the/path/of/the/raw/data/on/HPC
 
 # if you are working on the local machine, download the raw data
 ./script/copy_rawdata.sh $DATAPATH --download
+
+# check the sample (folder) names
+# the pattern of the sample names should be:
+# IP_NNN.1, IP_NNN.2, IP_NNN.3
+# Input_NNN.1, Input_NNN.2, Input_NNN.3
+# NNN should NOT start with a number
 ```
 
 ### 4. Rename the raw data
