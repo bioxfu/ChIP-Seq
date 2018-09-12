@@ -1,0 +1,57 @@
+species: Arabidopsis thaliana
+
+seq_info:
+  type: ChIP-Seq
+  mode: PE
+  replicate: 3
+
+path: /home/xfu/Project/HYH_20180911/ChIP-Seq/fastq/
+
+samples:
+  - Input_5DAG_lec1l1l.1
+  - Input_5DAG_lec1l1l.2
+  - Input_5DAG_lec1l1l.3
+  - Input_5DAG_WT.1
+  - Input_5DAG_WT.2
+  - Input_5DAG_WT.3
+  - IP_5DAG_lec1l1l.1
+  - IP_5DAG_lec1l1l.2
+  - IP_5DAG_lec1l1l.3
+  - IP_5DAG_WT.1
+  - IP_5DAG_WT.2
+  - IP_5DAG_WT.3
+
+treat:
+  - 5DAG_lec1l1l.1
+  - 5DAG_lec1l1l.2
+  - 5DAG_lec1l1l.3
+  - 5DAG_WT.1
+  - 5DAG_WT.2
+  - 5DAG_WT.3
+
+cpu: 30
+
+Rscript_path: /home/xfu/R/3.2.4/bin/Rscript
+
+conda_path: /home/xfu/miniconda2/envs/gmatic/bin
+
+adapter: /home/xfu/miniconda2/envs/gmatic/share/trimmomatic/adapters/TruSeq3-PE-2.fa
+
+index: /home/xfu/Gmatic7/genome/tair10/bowtie2/tair10
+
+chromSize: /home/xfu/Gmatic7/genome/tair10/tair10.chromSize
+
+txdb: /home/xfu/Gmatic7/gene/tair10/txdb/tair10_txdb.sqlite
+
+gene_anno: /home/xfu/Gmatic7/gene/tair10/tair10_gene_anno.tsv
+
+gene_bed: /home/xfu/Gmatic7/gene/tair10/tair10_gene.bed
+
+IGV: /home/xfu/igv/genomes/tair10.genome
+
+gsize: 119667750
+
+p: 1e-5
+
+olp.mask: WT:1,2,3^lec1l1l:1,2,3
+

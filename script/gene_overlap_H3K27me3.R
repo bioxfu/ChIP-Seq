@@ -8,14 +8,14 @@ input <- argv[1]
 output <- argv[2]
 
 options(stringsAsFactors = F)
-genome <- read.table('/home/xfu/Gmatic5/old_version/Gmatic3/bin/geneOverlap_bg_tair10_genes')
+genome <- read.table('/home/xfu/Gmatic7/pub_data/geneOverlap_bg_tair10_genes')
 targets <- read.table(input, head=T, sep='\t', quote='')
 targets <- targets[(targets$distanceToTSS < targets$geneLength & targets$distanceToTSS > -1000), ]
 
-#k27_cxf <- read.table('/home/xfu/Gmatic5/pub_data/arab_H3K27me3/H3K27me3_CXF.txt')
+#k27_cxf <- read.table('/home/xfu/Gmatic7/pub_data/arab_H3K27me3/H3K27me3_CXF.txt')
 #colnames(k27_cxf) <- 'geneId'
 
-k27_zyj <- read.table('/home/xfu/Gmatic5/pub_data/arab_H3K27me3/H3K27me3_ZYJ.txt')
+k27_zyj <- read.table('/home/xfu/Gmatic7/pub_data/arab_H3K27me3/H3K27me3_ZYJ.txt')
 colnames(k27_zyj) <- 'geneId'
 
 gene_lst <- list(targets=targets$geneId %>% unique(),
