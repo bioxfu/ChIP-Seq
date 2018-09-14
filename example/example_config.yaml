@@ -29,6 +29,10 @@ treat:
   - 5DAG_WT.2
   - 5DAG_WT.3
 
+olp: 
+  - WT:1.2.3
+  - lec1l1l:1.2.3
+
 cpu: 30
 
 Rscript_path: /home/xfu/R/3.2.4/bin/Rscript
@@ -57,7 +61,4 @@ IGV: /home/xfu/igv/genomes/tair10.genome
 
 gsize: 119667750
 
-p: 1e-2
-
-olp.mask: s104:1,2,3
-
+p: 1e-5

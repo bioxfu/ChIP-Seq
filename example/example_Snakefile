@@ -23,25 +23,25 @@ rule all:
 		expand('figure/peak_{p}_correlation_heatmap_peak_score.pdf', p=config['p']),
 		expand('figure/peak_{p}_correlation_heatmap_read_count.pdf', p=config['p']),
 		expand('RData/peak_{p}_dba.RData', p=config['p']),
-		expand('figure/peak_{p}_overlap.pdf', p=config['p']),
-		expand('peak_{p}/consensusPeaks.bed', p=config['p']),
-		expand('peak_{p}/consensusPeaks_anno.xls', p=config['p']),
-		expand('peak_{p}/consensusPeaks_annoPie.pdf', p=config['p']),
+		expand('figure/peak_{p}_{olp}_overlap.pdf', p=config['p'], olp=config['olp']),
+		expand('peak_{p}/{olp}_consensusPeaks.bed', p=config['p'], olp=config['olp']),
+		expand('peak_{p}/{olp}_consensusPeaks_anno.xls', p=config['p'], olp=config['olp']),
+		expand('peak_{p}/{olp}_consensusPeaks_annoPie.pdf', p=config['p'], olp=config['olp']),
 		
 		## Motif Analysis
-		expand('peak_{p}/consensusSubmits.bed', p=config['p']),
-		expand('meme-chip/peak_{p}_consensusSubmits_1K_windown.bed', p=config['p']),
-		expand('meme-chip/peak_{p}_consensusSubmits_1K_windown.fa.masked', p=config['p']),
-		expand('meme-chip/peak_{p}_meme-chip', p=config['p']),
+		#expand('peak_{p}/{olp}_consensusSubmits.bed', p=config['p']),
+		#expand('meme-chip/{olp}_peak_{p}_consensusSubmits_1K_windown.bed', p=config['p']),
+		#expand('meme-chip/{olp}_peak_{p}_consensusSubmits_1K_windown.fa.masked', p=config['p']),
+		#expand('meme-chip/{olp}_peak_{p}_meme-chip', p=config['p']),
 
 		## Gene Profiling Analysis
-		expand('matrix/{samples}_gene1K.gz', samples=config['samples']),
-		expand('matrix/{samples}_gene1K_profile.tab', samples=config['samples']),
-		expand('figure/{samples}_gene1K_profile.png', samples=config['samples']),
-		expand('figure/{treat}_gene1K_profile.pdf', treat=config['treat']),
+		#expand('matrix/{samples}_gene1K.gz', samples=config['samples']),
+		#expand('matrix/{samples}_gene1K_profile.tab', samples=config['samples']),
+		#expand('figure/{samples}_gene1K_profile.png', samples=config['samples']),
+		#expand('figure/{treat}_gene1K_profile.pdf', treat=config['treat']),
 
 		## Overlap Analysis
-		expand('figure/{treat}_peak_{p}_targets_H3K27me3_overlap.pdf', treat=config['treat'], p=config['p']),
+		#expand('figure/{treat}_peak_{p}_targets_H3K27me3_overlap.pdf', treat=config['treat'], p=config['p']),
 		
 		## Differential Binding Analysis
 		## if has replicates, use diffbind 
@@ -275,21 +275,20 @@ rule peakset_overlap:
 	input:
 		'RData/peak_{p}_dba.RData'
 	output:
-		'figure/peak_{p}_overlap.pdf',
-		'peak_{p}/consensusPeaks.bed',
-		'peak_{p}/consensusSubmits.bed'
+		pdf = 'figure/peak_{p}_{olp}_overlap.pdf',
+		peak = 'peak_{p}/{olp}_consensusPeaks.bed',
+		submit = 'peak_{p}/{olp}_consensusSubmits.bed'
 	params:
-		mask = config['olp.mask'],
 		Rscript = config['Rscript_path']
 	shell:
-		'{params.Rscript} script/peakset_overlap.R {input} {params.mask} {output}'
+		'{params.Rscript} script/peakset_overlap.R {input} {output}'
 
 rule consensus_peak_anno:
 	input:
-		bed = 'peak_{p}/consensusPeaks.bed'
+		bed = 'peak_{p}/{olp}_consensusPeaks.bed'
 	output:
-		xls = 'peak_{p}/consensusPeaks_anno.xls',
-		pie = 'peak_{p}/consensusPeaks_annoPie.pdf'
+		xls = 'peak_{p}/{olp}_consensusPeaks_anno.xls',
+		pie = 'peak_{p}/{olp}_consensusPeaks_annoPie.pdf'
 	params:
 		txdb = config['txdb'],
 		gene_anno = config['gene_anno'],
@@ -309,9 +308,9 @@ rule gene_overlap_H3K27me3:
 
 rule extend_submits:
 	input:
-		'peak_{p}/consensusSubmits.bed'
+		'peak_{p}/{olp}_consensusSubmits.bed'
 	output:
-		'meme-chip/peak_{p}_consensusSubmits_1K_windown.bed'
+		'meme-chip/{olp}_peak_{p}_consensusSubmits_1K_windown.bed'
 	params:
 		conda = config['conda_path'],
 		chromSize = config['chromSize']
@@ -320,9 +319,9 @@ rule extend_submits:
  
 rule get_windows_fasta:
 	input:
-		'meme-chip/peak_{p}_consensusSubmits_1K_windown.bed'
+		'meme-chip/{olp}_peak_{p}_consensusSubmits_1K_windown.bed'
 	output:
-		'meme-chip/peak_{p}_consensusSubmits_1K_windown.fa'
+		'meme-chip/{olp}_peak_{p}_consensusSubmits_1K_windown.fa'
 	params:
 		conda = config['conda_path'],
 		fasta = config['fasta']
@@ -331,9 +330,9 @@ rule get_windows_fasta:
  
 rule repeatmasker:
 	input:
-		'meme-chip/peak_{p}_consensusSubmits_1K_windown.fa'
+		'meme-chip/{olp}_peak_{p}_consensusSubmits_1K_windown.fa'
 	output:
-		'meme-chip/peak_{p}_consensusSubmits_1K_windown.fa.masked'
+		'meme-chip/{olp}_peak_{p}_consensusSubmits_1K_windown.fa.masked'
 	params:
 		RepeatMasker = config['RepeatMasker']	
 	shell:
@@ -341,10 +340,10 @@ rule repeatmasker:
  
 rule meme_chip:
 	input:
-		'meme-chip/peak_{p}_consensusSubmits_1K_windown.fa.masked'
+		'meme-chip/{olp}_peak_{p}_consensusSubmits_1K_windown.fa.masked'
 	output:
-		meme_dir = 'meme-chip/peak_{p}_meme-chip',
-		meme_html = 'meme-chip/peak_{p}_meme-chip/meme-chip.html'
+		meme_dir = 'meme-chip/{olp}_peak_{p}_meme-chip',
+		meme_html = 'meme-chip/{olp}_peak_{p}_meme-chip/meme-chip.html'
 	params:
 		motif = config['motif']
 	shell:

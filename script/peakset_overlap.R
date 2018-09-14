@@ -2,13 +2,13 @@ suppressPackageStartupMessages(library(DiffBind))
 
 argv <- commandArgs(T)
 input_rdata <- argv[1]
-MASK <- argv[2]
-output_pdf <- argv[3]
-bedout <- argv[4]
-submitout <- argv[5]
+output_pdf <- argv[2]
+bedout <- argv[3]
+submitout <- argv[4]
+
 load(input_rdata)
 
-mask_lst <- unlist(strsplit(MASK, '^', fixed = TRUE))
+mask <- unlist(strsplit(output_pdf, '_'))[3]
 
 grange2bed <- function(x) {
   df <- data.frame(seqnames=seqnames(x),
@@ -54,8 +54,6 @@ find_overlap <- function(x) {
 }
 
 pdf(output_pdf)
-for (m in mask_lst) {
-  find_overlap(m)
-}
+find_overlap(mask)
 dev.off()
 
