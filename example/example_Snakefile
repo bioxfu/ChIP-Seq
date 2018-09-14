@@ -23,6 +23,16 @@ rule all:
 		expand('figure/peak_{p}_correlation_heatmap_peak_score.pdf', p=config['p']),
 		expand('figure/peak_{p}_correlation_heatmap_read_count.pdf', p=config['p']),
 		expand('RData/peak_{p}_dba.RData', p=config['p']),
+		expand('figure/peak_{p}_overlap.pdf', p=config['p']),
+		expand('peak_{p}/consensusPeaks.bed', p=config['p']),
+		expand('peak_{p}/consensusPeaks_anno.xls', p=config['p']),
+		expand('peak_{p}/consensusPeaks_annoPie.pdf', p=config['p']),
+		
+		## Motif Analysis
+		expand('peak_{p}/consensusSubmits.bed', p=config['p']),
+		expand('meme-chip/peak_{p}_consensusSubmits_1K_windown.bed', p=config['p']),
+		expand('meme-chip/peak_{p}_consensusSubmits_1K_windown.fa.masked', p=config['p']),
+		expand('meme-chip/peak_{p}_meme-chip', p=config['p']),
 
 		## Gene Profiling Analysis
 		expand('matrix/{samples}_gene1K.gz', samples=config['samples']),
@@ -31,7 +41,6 @@ rule all:
 		expand('figure/{treat}_gene1K_profile.pdf', treat=config['treat']),
 
 		## Overlap Analysis
-		expand('figure/peak_{p}_overlap.pdf', p=config['p']),
 		expand('figure/{treat}_peak_{p}_targets_H3K27me3_overlap.pdf', treat=config['treat'], p=config['p']),
 		
 		## Differential Binding Analysis
@@ -266,12 +275,27 @@ rule peakset_overlap:
 	input:
 		'RData/peak_{p}_dba.RData'
 	output:
-		'figure/peak_{p}_overlap.pdf'
+		'figure/peak_{p}_overlap.pdf',
+		'peak_{p}/consensusPeaks.bed',
+		'peak_{p}/consensusSubmits.bed'
 	params:
 		mask = config['olp.mask'],
 		Rscript = config['Rscript_path']
 	shell:
 		'{params.Rscript} script/peakset_overlap.R {input} {params.mask} {output}'
+
+rule consensus_peak_anno:
+	input:
+		bed = 'peak_{p}/consensusPeaks.bed'
+	output:
+		xls = 'peak_{p}/consensusPeaks_anno.xls',
+		pie = 'peak_{p}/consensusPeaks_annoPie.pdf'
+	params:
+		txdb = config['txdb'],
+		gene_anno = config['gene_anno'],
+		Rscript = config['Rscript_path']
+	shell:
+		"{params.Rscript} script/peak_anno.R {input} {params.txdb} {params.gene_anno} {output}"	
 
 rule gene_overlap_H3K27me3:
 	input:
@@ -283,6 +307,48 @@ rule gene_overlap_H3K27me3:
 	shell:
 		"{params.Rscript} script/gene_overlap_H3K27me3.R {input} {output}"	
 
+rule extend_submits:
+	input:
+		'peak_{p}/consensusSubmits.bed'
+	output:
+		'meme-chip/peak_{p}_consensusSubmits_1K_windown.bed'
+	params:
+		conda = config['conda_path'],
+		chromSize = config['chromSize']
+	shell:
+		"{params.conda}/bedtools slop -i {input} -b 500 -g {params.chromSize} > {output}"
+ 
+rule get_windows_fasta:
+	input:
+		'meme-chip/peak_{p}_consensusSubmits_1K_windown.bed'
+	output:
+		'meme-chip/peak_{p}_consensusSubmits_1K_windown.fa'
+	params:
+		conda = config['conda_path'],
+		fasta = config['fasta']
+	shell:
+		"{params.conda}/bedtools getfasta -fi {params.fasta} -bed {input} -name -fo {output}"
+ 
+rule repeatmasker:
+	input:
+		'meme-chip/peak_{p}_consensusSubmits_1K_windown.fa'
+	output:
+		'meme-chip/peak_{p}_consensusSubmits_1K_windown.fa.masked'
+	params:
+		RepeatMasker = config['RepeatMasker']	
+	shell:
+		"{params.RepeatMasker} -dir meme-chip {input}"
+ 
+rule meme_chip:
+	input:
+		'meme-chip/peak_{p}_consensusSubmits_1K_windown.fa.masked'
+	output:
+		meme_dir = 'meme-chip/peak_{p}_meme-chip',
+		meme_html = 'meme-chip/peak_{p}_meme-chip/meme-chip.html'
+	params:
+		motif = config['motif']
+	shell:
+		'meme-chip -meme-p 16 -meme-maxw 10 -db {params.motif} -oc {output.meme_dir} {input}'
 
 
 #rule diff_test:
