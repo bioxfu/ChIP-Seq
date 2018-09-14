@@ -8,8 +8,9 @@ fastqc/
 figure/
 peak_1e-2/
 peak_1e-5/
-sample_sheet_peak_1e-2.csv
-sample_sheet_peak_1e-5.csv
+sample_sheet*
+stat/
+meme-chip
 table/
 track/
 Snakefile
