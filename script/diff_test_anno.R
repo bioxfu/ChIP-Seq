@@ -6,19 +6,15 @@ library(xlsx)
 argv <- commandArgs(T)
 input_rdata <- argv[1]
 sqlite <- argv[2]
-gene2GO <- argv[3]
-output_rdata <- argv[4]
-output_xlsx <- argv[5]
+output_rdata <- argv[3]
+output_xlsx <- argv[4]
 
 load(input_rdata)
 txdb <- loadDb(sqlite)
-GO <- read.table(gene2GO, sep='\t', quote="", stringsAsFactors = F)
-colnames(GO) <- c('geneId', 'GOterm')
 
 gene_anno <- function(x) {
-  peakAnno <- annotatePeak(x, TxDb=txdb)
+  peakAnno <- annotatePeak(x, TxDb=txdb, tssRegion = c(-2000,0))
   anno <- as.data.frame(peakAnno)
-  anno <- merge(anno, GO, all.x=T)
   return(anno)
 }
 

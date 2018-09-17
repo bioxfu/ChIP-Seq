@@ -45,9 +45,9 @@ rule all:
 		
 		## Differential Binding Analysis
 		## if has replicates, use diffbind 
-		#expand('RData/peak_{p}_diff_test.RData', p=config['p']),
-		#expand('RData/peak_{p}_diff_test_anno.RData', p=config['p']),
-		#expand('table/peak_{p}_diff_test_anno.xlsx', p=config['p']),
+		expand('RData/peak_{p}_diff_test.RData', p=config['p']),
+		expand('RData/peak_{p}_diff_test_anno.RData', p=config['p']),
+		expand('table/peak_{p}_diff_test_anno.xlsx', p=config['p']),
 		## if not, use MAnorm 
 		#["MAnorm/{peak1}_vs_{peak2}_{p}/_all_peak_MAvalues.anno".format(peak1=x[0], peak2=x[1], p=config['p']) for x in zip(config['peak1'], config['peak2'])],
 		#expand('table/all_peak_{p}_MAvalues_anno.xlsx', p=config['p']),
@@ -349,29 +349,30 @@ rule meme_chip:
 	shell:
 		'meme-chip -meme-p 16 -meme-maxw 10 -db {params.motif} -oc {output.meme_dir} {input}'
 
-
-#rule diff_test:
-#	input:
-#		'RData/peak_{p}_dba.RData'
-#	output:
-#		'RData/peak_{p}_diff_test.RData'
-#	params:
-#		mask = config['diff.mask']
-#	shell:
-#		'Rscript script/diff_test.R {input} {params.mask} {output}'
-# 
-#rule diff_test_anno:
-#	input:
-#		'RData/peak_{p}_diff_test.RData'
-#	output:
-#		RData = 'RData/peak_{p}_diff_test_anno.RData',
-#		xlsx = 'table/peak_{p}_diff_test_anno.xlsx',
-#	params:
-#		txdb = config['txdb'],
-#		gene_anno = config['gene_anno']
-#	shell:
-#		'Rscript script/diff_test_anno.R {input} {params.txdb} {params.gene2go} {output.RData} {output.xlsx}'
-# 
+rule diff_test:
+	input:
+		'RData/peak_{p}_dba.RData'
+	output:
+		'RData/peak_{p}_diff_test.RData'
+	params:
+		mask = config['diff.mask'],
+		Rscript = config['Rscript_path']
+	shell:
+		'{params.Rscript}  script/diff_test.R {input} {params.mask} {output}'
+ 
+rule diff_test_anno:
+	input:
+		'RData/peak_{p}_diff_test.RData'
+	output:
+		RData = 'RData/peak_{p}_diff_test_anno.RData',
+		xlsx = 'table/peak_{p}_diff_test_anno.xlsx',
+	params:
+		Rscript = config['Rscript_path'],
+		txdb = config['txdb'],
+		gene_anno = config['gene_anno']
+	shell:
+		'{params.Rscript}  script/diff_test_anno.R {input} {params.txdb} {output.RData} {output.xlsx}'
+ 
 #rule MAnorm:
 #	input:
 #		peak1 = 'peak_{p}/{peak1}_peaks.bed',

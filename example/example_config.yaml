@@ -33,6 +33,9 @@ olp:
   - WT:1.2.3
   - lec1l1l:1.2.3
 
+diff.mask:
+  - lec1l1l,WT
+  
 cpu: 30
 
 Rscript_path: /home/xfu/R/3.2.4/bin/Rscript
