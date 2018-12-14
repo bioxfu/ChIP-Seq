@@ -27,6 +27,10 @@ rule all:
 		expand('peak_{p}/{olp}_consensusPeaks.bed', p=config['p'], olp=config['olp']),
 		expand('peak_{p}/{olp}_consensusPeaks_anno.xls', p=config['p'], olp=config['olp']),
 		expand('peak_{p}/{olp}_consensusPeaks_annoPie.pdf', p=config['p'], olp=config['olp']),
+		expand('peak_{p}/{olp}_any2Peaks.bed', p=config['p'], olp=config['olp']),
+		expand('peak_{p}/{olp}_any2Peaks_anno.xls', p=config['p'], olp=config['olp']),
+		expand('peak_{p}/{olp}_any2Peaks_annoPie.pdf', p=config['p'], olp=config['olp']),
+		expand('RData/peak_{p}_dba_for_any2Peaks.RData', p=config['p']),
 		
 		## Motif Analysis
 		#expand('peak_{p}/{olp}_consensusSubmits.bed', p=config['p']),
@@ -45,9 +49,9 @@ rule all:
 		
 		## Differential Binding Analysis
 		## if has replicates, use diffbind 
-		expand('RData/peak_{p}_diff_test.RData', p=config['p']),
-		expand('RData/peak_{p}_diff_test_anno.RData', p=config['p']),
-		expand('table/peak_{p}_diff_test_anno.xlsx', p=config['p']),
+		expand('RData/peak_{p}_diff_test_for_any2Peaks.RData', p=config['p']),
+		expand('RData/peak_{p}_diff_test_for_any2Peaks_anno.RData', p=config['p']),
+		expand('table/peak_{p}_diff_test_for_any2Peaks_anno.xlsx', p=config['p']),
 		## if not, use MAnorm 
 		#["MAnorm/{peak1}_vs_{peak2}_{p}/_all_peak_MAvalues.anno".format(peak1=x[0], peak2=x[1], p=config['p']) for x in zip(config['peak1'], config['peak2'])],
 		#expand('table/all_peak_{p}_MAvalues_anno.xlsx', p=config['p']),
@@ -277,7 +281,9 @@ rule peakset_overlap:
 	output:
 		pdf = 'figure/peak_{p}_{olp}_overlap.pdf',
 		peak = 'peak_{p}/{olp}_consensusPeaks.bed',
-		submit = 'peak_{p}/{olp}_consensusSubmits.bed'
+		submit = 'peak_{p}/{olp}_consensusSubmits.bed',
+		peak2 = 'peak_{p}/{olp}_any2Peaks.bed',
+		submit2 = 'peak_{p}/{olp}_any2Submits.bed'
 	params:
 		Rscript = config['Rscript_path']
 	shell:
@@ -289,6 +295,19 @@ rule consensus_peak_anno:
 	output:
 		xls = 'peak_{p}/{olp}_consensusPeaks_anno.xls',
 		pie = 'peak_{p}/{olp}_consensusPeaks_annoPie.pdf'
+	params:
+		txdb = config['txdb'],
+		gene_anno = config['gene_anno'],
+		Rscript = config['Rscript_path']
+	shell:
+		"{params.Rscript} script/peak_anno.R {input} {params.txdb} {params.gene_anno} {output}"	
+
+rule any2_peak_anno:
+	input:
+		bed = 'peak_{p}/{olp}_any2Peaks.bed'
+	output:
+		xls = 'peak_{p}/{olp}_any2Peaks_anno.xls',
+		pie = 'peak_{p}/{olp}_any2Peaks_annoPie.pdf'
 	params:
 		txdb = config['txdb'],
 		gene_anno = config['gene_anno'],
@@ -349,11 +368,25 @@ rule meme_chip:
 	shell:
 		'meme-chip -meme-p 16 -meme-maxw 10 -db {params.motif} -oc {output.meme_dir} {input}'
 
+rule load_data_for_any2Peaks:
+	input:
+		['bam/{sample}.bam'.format(sample=x) for x in config['samples']],
+		['peak_{p}/{olp}_any2Peaks.bed'.format(p=config['p'], olp=x) for x in config['olp']]
+	output:
+		sheet = 'sample_sheet_for_any2Peaks_peak_{p}.csv',
+		RData = 'RData/peak_{p}_dba_for_any2Peaks.RData'
+	params:
+		pvalue = config['p'],	
+		Rscript = config['Rscript_path']
+	shell:
+		"sed 's/$PEAK/peak_{params.pvalue}/' sample_sheet_for_any2Peaks.csv > {output.sheet}; "
+		"{params.Rscript} script/load_data_for_any2Peaks.R {output}"
+
 rule diff_test:
 	input:
-		'RData/peak_{p}_dba.RData'
+		'RData/peak_{p}_dba_for_any2Peaks.RData'
 	output:
-		'RData/peak_{p}_diff_test.RData'
+		'RData/peak_{p}_diff_test_for_any2Peaks.RData'
 	params:
 		mask = config['diff.mask'],
 		Rscript = config['Rscript_path']
@@ -362,10 +395,10 @@ rule diff_test:
  
 rule diff_test_anno:
 	input:
-		'RData/peak_{p}_diff_test.RData'
+		'RData/peak_{p}_diff_test_for_any2Peaks.RData'
 	output:
-		RData = 'RData/peak_{p}_diff_test_anno.RData',
-		xlsx = 'table/peak_{p}_diff_test_anno.xlsx',
+		RData = 'RData/peak_{p}_diff_test_for_any2Peaks_anno.RData',
+		xlsx = 'table/peak_{p}_diff_test_for_any2Peaks_anno.xlsx',
 	params:
 		Rscript = config['Rscript_path'],
 		txdb = config['txdb'],

@@ -1,5 +1,5 @@
 source activate gmatic
-conda env export > doc/environment.yml
+#conda env export > doc/environment.yml
 module add macs/1.4.2
 
 if [ ! -d fastqc ]; then

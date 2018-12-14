@@ -1,0 +1,7 @@
+SampleID,Factor,Replicate,bamReads,ControlID,bamControl,Peaks,PeakCaller
+lec1l1l.1,lec1l1l,1,bam/IP_5DAG_lec1l1l.1.bam,Input_lec1l1l.1,bam/Input_5DAG_lec1l1l.1.bam,$PEAK/lec1l1l:1.2.3_any2Peaks.bed,bed
+lec1l1l.2,lec1l1l,2,bam/IP_5DAG_lec1l1l.2.bam,Input_lec1l1l.2,bam/Input_5DAG_lec1l1l.2.bam,$PEAK/lec1l1l:1.2.3_any2Peaks.bed,bed
+lec1l1l.3,lec1l1l,3,bam/IP_5DAG_lec1l1l.3.bam,Input_lec1l1l.3,bam/Input_5DAG_lec1l1l.3.bam,$PEAK/lec1l1l:1.2.3_any2Peaks.bed,bed
+WT.1,WT,1,bam/IP_5DAG_WT.1.bam,Input_WT.1,bam/Input_5DAG_WT.1.bam,$PEAK/WT:1.2.3_any2Peaks.bed,bed
+WT.2,WT,2,bam/IP_5DAG_WT.2.bam,Input_WT.2,bam/Input_5DAG_WT.2.bam,$PEAK/WT:1.2.3_any2Peaks.bed,bed
+WT.3,WT,3,bam/IP_5DAG_WT.3.bam,Input_WT.3,bam/Input_5DAG_WT.3.bam,$PEAK/WT:1.2.3_any2Peaks.bed,bed
