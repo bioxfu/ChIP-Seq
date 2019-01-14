@@ -8,6 +8,13 @@ submitout <- argv[4]
 bedout2 <- argv[5]
 submitout2 <- argv[6]
 
+# input_rdata <- 'RData/peak_1e-5_dba.RData'
+# output_pdf <- 'figure/peak_1e-5_lec1l1l:2.3_overlap.pdf'
+# bedout <- 'peak_1e-5/lec1l1l:2.3_consensusPeaks.bed'
+# submitout <- 'peak_1e-5/lec1l1l:2.3_consensusSubmits.bed'
+# bedout2 <- 'peak_1e-5/lec1l1l:2.3_any2Peaks.bed'
+# submitout2 <- 'peak_1e-5/lec1l1l:2.3_any2Submits.bed'
+ 
 load(input_rdata)
 
 mask <- unlist(strsplit(output_pdf, '_'))[3]
@@ -53,8 +60,14 @@ find_overlap <- function(x) {
     dba.plotVenn(d_peak, mask, main=x, sub=paste0('inAll: ', inAll_prop, '%'))
     write.table(grange2bed(olp$inAll), bedout, col.names = F, row.names = F, sep = '\t', quote = F)
     write.table(grange2submit(olp$inAll), submitout, col.names = F, row.names = F, sep = '\t', quote = F)
-    any2bed <- rbind(grange2bed(olp$inAll), grange2bed(olp$notA), grange2bed(olp$notB), grange2bed(olp$notC))
-    any2submit <- rbind(grange2submit(olp$inAll), grange2submit(olp$notA), grange2submit(olp$notB), grange2submit(olp$notC))
+    if (sum(mask) == 3) {
+      any2bed <- rbind(grange2bed(olp$inAll), grange2bed(olp$notA), grange2bed(olp$notB), grange2bed(olp$notC))
+      any2submit <- rbind(grange2submit(olp$inAll), grange2submit(olp$notA), grange2submit(olp$notB), grange2submit(olp$notC))
+    }
+    else if (sum(mask) == 2) {
+      any2bed <- grange2bed(olp$inAll)
+      any2submit <- grange2submit(olp$inAll)
+    }
     write.table(any2bed, bedout2, col.names = F, row.names = F, sep = '\t', quote = F)
     write.table(any2submit, submitout2, col.names = F, row.names = F, sep = '\t', quote = F)
   } else {
