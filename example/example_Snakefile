@@ -147,7 +147,8 @@ rule bam_qc:
 
 rule bam_qc_stat:
 	input:
-		['bam/{sample}.bamqc/qualimapReport.html'.format(sample=x) for x in config['samples']]
+		['bam/{sample}.bamqc/qualimapReport.html'.format(sample=x) for x in config['samples']],
+		'stat/fastqc_stat.tsv'
 	output:
 		'stat/bamqc_stat.tsv'
 	params:

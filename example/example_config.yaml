@@ -38,30 +38,48 @@ diff.mask:
   
 cpu: 30
 
-Rscript_path: /home/xfu/R/3.2.4/bin/Rscript
+Rscript_path: /cluster/home/xfu/R/3.5.1/bin/Rscript
 
-RepeatMasker: /home/xfu/Git/MakerP/maker/exe/RepeatMasker/RepeatMasker
+RepeatMasker: /cluster/home/xfu/Git/MakerP/maker/exe/RepeatMasker/RepeatMasker
 
-motif: /home/xfu/Git/MEME/motifs/JASPAR2018_CORE_plants_non-redundant_pfms_meme.txt
+motif: /cluster/home/xfu/Git/MEME/motifs/JASPAR2018_CORE_plants_non-redundant_pfms_meme.txt
 
-conda_path: /home/xfu/miniconda2/envs/gmatic/bin
+conda_path: /cluster/home/xfu/miniconda2/envs/gmatic/bin
 
-adapter: /home/xfu/miniconda2/envs/gmatic/share/trimmomatic/adapters/TruSeq3-PE-2.fa
-
-index: /home/xfu/Gmatic7/genome/tair10/bowtie2/tair10
-
-chromSize: /home/xfu/Gmatic7/genome/tair10/tair10.chromSize
-
-fasta: /home/xfu/Gmatic7/genome/tair10/tair10.fa
-
-txdb: /home/xfu/Gmatic7/gene/tair10/txdb/tair10_txdb.sqlite
-
-gene_anno: /home/xfu/Gmatic7/gene/tair10/tair10_gene_anno.tsv
-
-gene_bed: /home/xfu/Gmatic7/gene/tair10/tair10_gene.bed
-
-IGV: /home/xfu/igv/genomes/tair10.genome
-
-gsize: 119667750
+adapter: /cluster/home/xfu/miniconda2/envs/gmatic/share/trimmomatic/adapters/TruSeq3-PE-2.fa
 
 p: 1e-5
+
+# Arabidopsis
+index: /cluster/home/xfu/Gmatic7/genome/tair10/bowtie2/tair10
+ 
+chromSize: /cluster/home/xfu/Gmatic7/genome/tair10/tair10.chromSize
+ 
+fasta: /cluster/home/xfu/Gmatic7/genome/tair10/tair10.fa
+ 
+txdb: /cluster/home/xfu/Gmatic7/gene/tair10/txdb/tair10_txdb.sqlite
+ 
+gene_anno: /cluster/home/xfu/Gmatic7/gene/tair10/tair10_gene_anno.tsv
+ 
+gene_bed: /cluster/home/xfu/Gmatic7/gene/tair10/tair10_gene.bed
+ 
+IGV: /cluster/home/xfu/igv/genomes/tair10.genome
+ 
+gsize: 119667750
+
+# Nicotiana benthamiana
+#index: /cluster/home/xfu/Gmatic7/genome/Niben/bowtie2/Niben101
+# 
+#chromSize: /cluster/home/xfu/Gmatic7/genome/Niben/Niben101.chromSize
+# 
+#fasta: /cluster/home/xfu/Gmatic7/genome/Niben/Niben101.fa
+# 
+#txdb: /cluster/home/xfu/Gmatic7/gene/Niben/txdb/Niben101_txdb.sqlite
+# 
+#gene_anno: /cluster/home/xfu/Gmatic7/gene/Niben/Niben101_gene_anno_ath.tsv
+# 
+#gene_bed: /cluster/home/xfu/Gmatic7/gene/Niben/Niben101_gene.bed
+# 
+#IGV: /cluster/home/xfu/igv/genomes/Niben101.genome
+# 
+#gsize: 2969810994
