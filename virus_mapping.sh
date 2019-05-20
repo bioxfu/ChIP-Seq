@@ -2,6 +2,11 @@ bowtie2-build index/viral.fasta index/viral
 
 mkdir virus_bam
 find clean/*_R1_paired*|sed 's/clean\///'|sed 's/_R1.*//'|parallel --gnu "bowtie2 -p 5 -x index/viral -1 clean/{}_R1_paired.fastq.gz -2 clean/{}_R2_paired.fastq.gz|samtools view -Sh -q 30 -F 4 -|grep -v 'XS:'|samtools view -Shub|samtools sort - -o virus_bam/{}.bam"
+
+# to check if virus reads are from nuclear genome
+find virus_bam/*.bam|parallel --gnu "bedtools bamtofastq -i {} -fq {}.fq"
+find virus_bam/*.bam.fq|parallel --gnu "bowtie2 -p5 -x /cluster/home/xfu/Gmatic7/genome/Niben/bowtie2/Niben101 -U {}|samtools view -Sh -F 4 -|samtools sort - -o {}.nucl.genome.bam"
+
 find virus_bam/*.bam|parallel --gnu "samtools index {} {}.bai"
 find virus_bam/*.bam|parallel --gnu "samtools view -c -F 4 {} > {}.cnt"
 find virus_bam/*.bam|parallel --gnu "samtools view -hub -F 16 {}|samtools depth -d 1000000 - > {}.cov"
