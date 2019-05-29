@@ -1,38 +1,74 @@
-species: Arabidopsis thaliana
+species: Nicotiana benthamiana
 
 seq_info:
   type: ChIP-Seq
   mode: PE
-  replicate: 3
+  replicate: 2
 
-path: /home/xfu/Project/HYH_20180911/ChIP-Seq/fastq/
+path: /cluster/home/xfu/Project/RL0026_20190327/ChIP-Seq/fastq/
 
 samples:
-  - Input_5DAG_lec1l1l.1
-  - Input_5DAG_lec1l1l.2
-  - Input_5DAG_lec1l1l.3
-  - Input_5DAG_WT.1
-  - Input_5DAG_WT.2
-  - Input_5DAG_WT.3
-  - IP_5DAG_lec1l1l.1
-  - IP_5DAG_lec1l1l.2
-  - IP_5DAG_lec1l1l.3
-  - IP_5DAG_WT.1
-  - IP_5DAG_WT.2
-  - IP_5DAG_WT.3
+  - EV-1_a-H3K27me3
+  - EV-1_a-H3
+  - EV-1_Input
+  - TYLCV-1_a-H3K27me3
+  - TYLCV-1_a-H3
+  - TYLCV-1_Input
+  - TYLCV-C3-mut-1_a-H3K27me3
+  - TYLCV-C3-mut-1_a-H3
+  - TYLCV-C3-mut-1_Input
+  - EV-2_a-H3K27me3
+  - EV-2_a-H3
+  - EV-2_Input
+  - TYLCV-2_a-H3K27me3
+  - TYLCV-2_a-H3
+  - TYLCV-2_Input
+  - TYLCV-C3-mut-2_a-H3K27me3
+  - TYLCV-C3-mut-2_a-H3
+  - TYLCV-C3-mut-2_Input
 
 treat:
-  - 5DAG_lec1l1l.1
-  - 5DAG_lec1l1l.2
-  - 5DAG_lec1l1l.3
-  - 5DAG_WT.1
-  - 5DAG_WT.2
-  - 5DAG_WT.3
+  - EV-1_a-H3K27me3
+  - EV-1_a-H3
+  - TYLCV-1_a-H3K27me3
+  - TYLCV-1_a-H3
+  - TYLCV-C3-mut-1_a-H3K27me3
+  - TYLCV-C3-mut-1_a-H3
+  - EV-2_a-H3K27me3
+  - EV-2_a-H3
+  - TYLCV-2_a-H3K27me3
+  - TYLCV-2_a-H3
+  - TYLCV-C3-mut-2_a-H3K27me3
+  - TYLCV-C3-mut-2_a-H3
 
-olp: 
+control:
+  - EV-1_Input
+  - EV-1_Input
+  - TYLCV-1_Input
+  - TYLCV-1_Input
+  - TYLCV-C3-mut-1_Input
+  - TYLCV-C3-mut-1_Input
+  - EV-2_Input
+  - EV-2_Input
+  - TYLCV-2_Input
+  - TYLCV-2_Input
+  - TYLCV-C3-mut-2_Input
+  - TYLCV-C3-mut-2_Input
+
+olp:
 # don't use '_' 
-  - WT:1.2.3
-  - lec1l1l:1.2.3
+  - H3K27me3-EV:1.2
+  - H3K27me3-TYLCV:1.2
+  - H3K27me3-TYLCV-C3mut:1.2
+  - H3-EV:1.2
+  - H3-TYLCV:1.2
+  - H3-TYLCV-C3mut:1.2
+
+peak1: 
+  - TYLCV-1_a-H3K27me3_c_TYLCV-1_Input
+
+peak2: 
+  - EV-1_a-H3K27me3_c_EV-1_Input
 
 diff.mask:
   - lec1l1l,WT
@@ -52,35 +88,36 @@ adapter: /cluster/home/xfu/miniconda2/envs/gmatic/share/trimmomatic/adapters/Tru
 p: 1e-5
 
 # Arabidopsis
-index: /cluster/home/xfu/Gmatic7/genome/tair10/bowtie2/tair10
- 
-chromSize: /cluster/home/xfu/Gmatic7/genome/tair10/tair10.chromSize
- 
-fasta: /cluster/home/xfu/Gmatic7/genome/tair10/tair10.fa
- 
-txdb: /cluster/home/xfu/Gmatic7/gene/tair10/txdb/tair10_txdb.sqlite
- 
-gene_anno: /cluster/home/xfu/Gmatic7/gene/tair10/tair10_gene_anno.tsv
- 
-gene_bed: /cluster/home/xfu/Gmatic7/gene/tair10/tair10_gene.bed
- 
-IGV: /cluster/home/xfu/igv/genomes/tair10.genome
- 
-gsize: 119667750
+#index: /cluster/home/xfu/Gmatic7/genome/tair10/bowtie2/tair10
+# 
+#chromSize: /cluster/home/xfu/Gmatic7/genome/tair10/tair10.chromSize
+# 
+#fasta: /cluster/home/xfu/Gmatic7/genome/tair10/tair10.fa
+# 
+#txdb: /cluster/home/xfu/Gmatic7/gene/tair10/txdb/tair10_txdb.sqlite
+# 
+#gene_anno: /cluster/home/xfu/Gmatic7/gene/tair10/tair10_gene_anno.tsv
+# 
+#gene_bed: /cluster/home/xfu/Gmatic7/gene/tair10/tair10_gene.bed
+# 
+#IGV: /cluster/home/xfu/igv/genomes/tair10.genome
+# 
+#gsize: 119667750
 
 # Nicotiana benthamiana
-#index: /cluster/home/xfu/Gmatic7/genome/Niben/bowtie2/Niben101
-# 
-#chromSize: /cluster/home/xfu/Gmatic7/genome/Niben/Niben101.chromSize
-# 
-#fasta: /cluster/home/xfu/Gmatic7/genome/Niben/Niben101.fa
-# 
-#txdb: /cluster/home/xfu/Gmatic7/gene/Niben/txdb/Niben101_txdb.sqlite
-# 
-#gene_anno: /cluster/home/xfu/Gmatic7/gene/Niben/Niben101_gene_anno_ath.tsv
-# 
-#gene_bed: /cluster/home/xfu/Gmatic7/gene/Niben/Niben101_gene.bed
-# 
-#IGV: /cluster/home/xfu/igv/genomes/Niben101.genome
-# 
-#gsize: 2969810994
+index: /cluster/home/xfu/Gmatic7/genome/Niben/bowtie2/Niben101
+ 
+chromSize: /cluster/home/xfu/Gmatic7/genome/Niben/Niben101.chromSize
+ 
+fasta: /cluster/home/xfu/Gmatic7/genome/Niben/Niben101.fa
+ 
+txdb: /cluster/home/xfu/Gmatic7/gene/Niben/txdb/Niben101_txdb.sqlite
+ 
+gene_anno: /cluster/home/xfu/Gmatic7/gene/Niben/Niben101_gene_anno_ath.tsv
+ 
+gene_bed: /cluster/home/xfu/Gmatic7/gene/Niben/Niben101_gene.bed
+ 
+IGV: /cluster/home/xfu/igv/genomes/Niben101.genome
+ 
+gsize: 2969810994
+
