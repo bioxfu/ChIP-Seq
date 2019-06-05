@@ -1,7 +1,7 @@
 suppressPackageStartupMessages(library(GenomicFeatures))
 suppressPackageStartupMessages(library(ChIPseeker))
 suppressPackageStartupMessages(library(DiffBind))
-library(xlsx)
+#library(xlsx)
 
 argv <- commandArgs(T)
 input_rdata <- argv[1]
@@ -13,7 +13,8 @@ load(input_rdata)
 txdb <- loadDb(sqlite)
 
 gene_anno <- function(x) {
-  peakAnno <- annotatePeak(x, TxDb=txdb, tssRegion = c(-2000,0))
+  #peakAnno <- annotatePeak(x, TxDb=txdb, tssRegion = c(-2000,0))
+  peakAnno <- annotatePeak(x[-1], TxDb=txdb, tssRegion = c(-2000,0)) # the first peak can't be annotated sometimes for some unknown reasons
   anno <- as.data.frame(peakAnno)
   return(anno)
 }
@@ -21,9 +22,9 @@ gene_anno <- function(x) {
 diff_peak_anno <- lapply(diff_peak, gene_anno)
 save(diff_peak_anno, file = output_rdata)
 
-wb <- createWorkbook()
-for (i in 1:length(diff_peak_anno)) {
-  sheet <- createSheet(wb, sheetName=names(diff_peak_anno)[i])
-  addDataFrame(diff_peak_anno[[i]], sheet, row.names=FALSE)
-}
-saveWorkbook(wb, output_xlsx)
+# wb <- createWorkbook()
+# for (i in 1:length(diff_peak_anno)) {
+#   sheet <- createSheet(wb, sheetName=names(diff_peak_anno)[i])
+#   addDataFrame(diff_peak_anno[[i]], sheet, row.names=FALSE)
+# }
+# saveWorkbook(wb, output_xlsx)
