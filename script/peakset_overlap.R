@@ -21,7 +21,8 @@ mask <- unlist(strsplit(output_pdf, '_'))[3]
 
 grange2bed <- function(x) {
   df <- data.frame(seqnames=seqnames(x),
-                   starts=start(x)-1,
+                   #starts=start(x)-1,
+                   starts=start(x),
                    ends=end(x),
                    names=paste0('MACS_peak_', 1:length(x)),
                    scores=apply(as.data.frame(x)[-c(1:5)], 1, max))
@@ -33,7 +34,8 @@ grange2bed <- function(x) {
 
 grange2submit <- function(x) {
   df <- data.frame(seqnames=seqnames(x),
-                   starts=start(x) + round((end(x) - start(x) + 1)/2) - 1,
+                   #starts=start(x) + round((end(x) - start(x) + 1)/2) - 1,
+                   starts=start(x) + round((end(x) - start(x) + 1)/2),
                    ends=start(x) + round((end(x) - start(x) + 1)/2),
                    names=paste0('MACS_submit_', 1:length(x)),
                    scores=apply(as.data.frame(x)[-c(1:5)], 1, max))
