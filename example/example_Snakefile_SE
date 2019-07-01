@@ -1,0 +1,447 @@
+configfile: "config.yaml"
+
+rule all:
+	input:
+		## Basic analysis
+		expand('clean/{sample}_clean.fastq.gz', sample=config['samples']),
+		expand('fastqc/raw/{sample}_fastqc.html', sample=config['samples']),
+		expand('fastqc/clean/{sample}_clean_fastqc.html', sample=config['samples']),
+		expand('stat/fastqc_stat.tsv'),
+		expand('bam/{sample}.bam', sample=config['samples']),
+		expand('bam/{sample}.bam.bai', sample=config['samples']),
+		expand('bam/{sample}.bamqc', sample=config['samples']),
+		expand('stat/bamqc_stat.tsv'),
+		expand('track/{sample}.tdf', sample=config['samples']),
+		expand('track/{sample}.bw', sample=config['samples']),
+		['peak_{p}/{treat}_c_{control}_peaks.bed'.format(treat=x[0], control=x[1], p=config['p']) for x in zip(config['treat'], config['control'])],
+		['peak_{p}/{treat}_c_{control}_peaks.xls'.format(treat=x[0], control=x[1], p=config['p']) for x in zip(config['treat'], config['control'])],
+		['peak_{p}/{treat}_c_{control}_peaks_anno.xls'.format(treat=x[0], control=x[1], p=config['p']) for x in zip(config['treat'], config['control'])],
+		['peak_{p}/{treat}_c_{control}_peaks_annoPie.pdf'.format(treat=x[0], control=x[1], p=config['p']) for x in zip(config['treat'], config['control'])],
+		#expand('figure/peak_{p}_correlation_heatmap_peak_score.pdf', p=config['p']),
+		#expand('figure/peak_{p}_correlation_heatmap_read_count.pdf', p=config['p']),
+		#expand('RData/peak_{p}_dba.RData', p=config['p']),
+		#expand('figure/peak_{p}_{olp}_overlap.pdf', p=config['p'], olp=config['olp']),
+		#expand('peak_{p}/{olp}_consensusPeaks_anno.xls', p=config['p'], olp=config['olp']),
+		#expand('peak_{p}/{olp}_consensusPeaks_annoPie.pdf', p=config['p'], olp=config['olp']),
+		#expand('peak_{p}/{olp}_any2Peaks_anno.xls', p=config['p'], olp=config['olp']),
+		#expand('peak_{p}/{olp}_any2Peaks_annoPie.pdf', p=config['p'], olp=config['olp']),
+		#expand('RData/peak_{p}_dba_for_any2Peaks.RData', p=config['p']),
+		
+		## Motif Analysis
+		#expand('peak_{p}/{olp}_consensusSubmits.bed', p=config['p']),
+		#expand('meme-chip/{olp}_peak_{p}_consensusSubmits_1K_windown.bed', p=config['p']),
+		#expand('meme-chip/{olp}_peak_{p}_consensusSubmits_1K_windown.fa.masked', p=config['p']),
+		#expand('meme-chip/{olp}_peak_{p}_meme-chip', p=config['p']),
+
+		## Gene Profiling Analysis
+		#expand('matrix/{samples}_gene1K.gz', samples=config['samples']),
+		#expand('matrix/{samples}_gene1K_profile.tab', samples=config['samples']),
+		#expand('figure/{samples}_gene1K_profile.png', samples=config['samples']),
+		#expand('figure/{treat}_gene1K_profile.pdf', treat=config['treat']),
+
+		## Overlap Analysis
+		#expand('figure/{treat}_peak_{p}_targets_H3K27me3_overlap.pdf', treat=config['treat'], p=config['p']),
+		
+		## Differential Binding Analysis
+		## if has replicates, use diffbind 
+		#expand('RData/peak_{p}_diff_test_for_any2Peaks.RData', p=config['p']),
+		#expand('RData/peak_{p}_diff_test_for_any2Peaks_anno.RData', p=config['p']),
+		#expand('table/peak_{p}_diff_test_for_any2Peaks_anno.xlsx', p=config['p']),
+		## if not, use MAnorm 
+		#["MAnorm/{treat1}_c_{control1}_vs_{treat2}_c_{control2}_{p}/_all_peak_MAvalues.anno".format(treat1=x[0].split('_c_')[0], control1=x[0].split('_c_')[1], treat2=x[1].split('_c_')[0], control2=x[1].split('_c_')[1], p=config['p']) for x in zip(config['peak1'], config['peak2'])],
+
+		#expand('table/all_peak_{p}_MAvalues_anno.xlsx', p=config['p']),
+		#'doc/report.html'
+
+rule fastqc_raw_SE:
+	input:
+		config['path']+'/{sample}.fastq.gz'
+	output:
+		'fastqc/raw/{sample}_fastqc.html'
+	params:
+		conda = config['conda_path']
+	shell:
+		'{params.conda}/fastqc -o fastqc/raw {input}'
+
+rule trimmomatic_SE:
+	input:
+		config['path']+'/{sample}.fastq.gz'
+	output:
+		'clean/{sample}_clean.fastq.gz'
+	params:
+		conda = config['conda_path'],
+		adapter = config['adapter']
+	shell:
+		'{params.conda}/trimmomatic SE -threads 3 -phred33 {input} {output} ILLUMINACLIP:{params.adapter}:2:30:10 LEADING:3 TRAILING:3 SLIDINGWINDOW:4:15 MINLEN:36'
+
+rule fastqc_clean_SE:
+	input:
+		'clean/{sample}_clean.fastq.gz'
+	output:
+		'fastqc/clean/{sample}_clean_fastqc.html'
+	params:
+		conda = config['conda_path']
+	shell:
+		'{params.conda}/fastqc -o fastqc/clean {input}'
+
+rule fastqc_stat_SE:
+	input:
+		['fastqc/raw/{sample}_fastqc.html'.format(sample=x) for x in config['samples']],
+		['fastqc/clean/{sample}_clean_fastqc.html'.format(sample=x) for x in config['samples']]
+	output:
+		'stat/fastqc_stat.tsv'
+	params:
+		Rscript = config['Rscript_path']
+	shell:
+		'{params.Rscript} script/reads_stat_by_fastqcr.R'
+
+
+rule bowtie2:
+	input:
+		'clean/{sample}_clean.fastq.gz'
+	output:
+		bam = 'bam/{sample}.bam'
+	params:
+		prefix = 'bam/{sample}',
+		cpu = config['cpu'],
+		index = config['index'],
+		conda = config['conda_path']		
+	shell:
+		"{params.conda}/bowtie2 -p {params.cpu} -x {params.index} -U {input}|samtools view -Sh -q 30 -F 4 -|grep -v 'XS:'|samtools view -Shub|samtools sort - -T {params.prefix} -o {output.bam}"
+
+rule bam_idx:
+	input:
+		bam = 'bam/{sample}.bam'
+	output:
+		bai = 'bam/{sample}.bam.bai'
+	params:
+		conda = config['conda_path']
+	shell:
+		'{params.conda}/samtools index {input.bam} {output.bai}'
+
+rule bam_qc:
+	input:
+		bam = 'bam/{sample}.bam'
+	output:
+		bamqc_dir = 'bam/{sample}.bamqc',
+		bamqc_html = 'bam/{sample}.bamqc/qualimapReport.html'
+	params:
+		cpu = config['cpu'],
+		conda = config['conda_path']
+	shell:
+		"{params.conda}/qualimap bamqc --java-mem-size=10G -nt {params.cpu} -bam {input.bam} -outdir {output.bamqc_dir}"
+
+rule bam_qc_stat:
+	input:
+		['bam/{sample}.bamqc/qualimapReport.html'.format(sample=x) for x in config['samples']],
+		'stat/fastqc_stat.tsv'
+	output:
+		'stat/bamqc_stat.tsv'
+	params:
+		Rscript = config['Rscript_path']		
+	shell:
+		"{params.Rscript} script/mapping_stat_by_bamqc.R"
+
+rule bam2bed:
+	input:
+		bam = 'bam/{sample}.bam'
+	output:
+		bed = 'MAnorm/{sample}.bed'
+	shell:
+		"bedtools bamtobed -split -i {input.bam} > {output.bed}"
+
+rule bam2count:
+	input:
+		bam = 'bam/{sample}.bam'
+	output:
+		cnt = 'bam/{sample}.cnt'
+	params:
+		conda = config['conda_path']
+	shell:
+		"{params.conda}/samtools view -c -F 4 {input.bam} > {output.cnt}"
+		
+rule bam2bedgraph:
+	input:
+		bam = 'bam/{sample}.bam',
+		cnt = 'bam/{sample}.cnt'
+	output:
+		bg = 'track/{sample}.bedgraph'
+	params:
+		conda = config['conda_path']
+	shell:
+		"X=`awk '{{print 1/$1*1000000}}' {input.cnt}`; "
+		"{params.conda}/bedtools genomecov -ibam {input.bam} -bga -scale $X -split > {output.bg}"
+
+rule bedgraph2tdf:
+	input:
+		bg = 'track/{sample}.bedgraph'
+	output:
+		tdf = 'track/{sample}.tdf'
+	params:
+		IGV = config['IGV'],
+		conda = config['conda_path']
+	shell:
+		"{params.conda}/igvtools toTDF {input.bg} {output.tdf} {params.IGV}"
+
+rule bedgraph2bw:
+	input:
+		bg = 'track/{sample}.bedgraph'
+	output:
+		bw = 'track/{sample}.bw'
+	params:
+		chromSize = config['chromSize'],
+		conda = config['conda_path']		
+	shell:
+		"{params.conda}/wigToBigWig {input} {params.chromSize} {output}"
+
+rule macs14:
+	input:
+		treat = 'bam/{treat}.bam',
+		control = 'bam/{control}.bam'
+	output:
+		bed = 'peak_{p}/{treat}_c_{control}_peaks.bed',
+		xls = 'peak_{p}/{treat}_c_{control}_peaks.xls'
+	params:
+		gsize = config['gsize'],
+		pvalue = config['p'],
+		prefix = 'peak_{p}/{treat}_c_{control}'
+	shell:
+		'macs14 -t {input.treat} -c {input.control} -g {params.gsize} -p {params.pvalue} -n {params.prefix} --nomodel'
+
+rule peak_anno:
+	input:
+		bed = 'peak_{p}/{treat}_c_{control}_peaks.bed'
+	output:
+		xls = 'peak_{p}/{treat}_c_{control}_peaks_anno.xls',
+		pie = 'peak_{p}/{treat}_c_{control}_peaks_annoPie.pdf'
+	params:
+		txdb = config['txdb'],
+		gene_anno = config['gene_anno'],
+		Rscript = config['Rscript_path']
+	shell:
+		"{params.Rscript} script/peak_anno.R {input} {params.txdb} {params.gene_anno} {output}"	
+
+rule load_data_QC:
+	input:
+		['bam/{sample}.bam'.format(sample=x) for x in config['samples']],
+		['peak_{p}/{treat}_c_{control}_peaks.bed'.format(treat=x[0], control=x[1], p=config['p']) for x in zip(config['treat'], config['control'])],
+	output:
+		sheet = 'sample_sheet_peak_{p}.csv',
+		heatmap_peak = 'figure/peak_{p}_correlation_heatmap_peak_score.pdf',
+		heatmap_count = 'figure/peak_{p}_correlation_heatmap_read_count.pdf',
+		RData = 'RData/peak_{p}_dba.RData'
+	params:
+		pvalue = config['p'],	
+		Rscript = config['Rscript_path']
+	shell:
+		"sed 's/$PEAK/peak_{params.pvalue}/' sample_sheet.csv > {output.sheet}; "
+		"{params.Rscript} script/load_data_QC.R {output}"
+
+rule computeMatrix:
+	input:
+		bw = 'track/{samples}.bw'
+	output:
+		mat = 'matrix/{samples}_gene1K.gz'
+	params:
+		gene_bed = config['gene_bed'],
+		conda = config['conda_path']		
+	shell:
+		"{params.conda}/computeMatrix scale-regions -m 1000 -b 1000 -a 1000 -R {params.gene_bed} -S {input} --skipZeros -p 30 -o {output}"
+
+rule plotProfile:
+	input:
+		mat = 'matrix/{samples}_gene1K.gz'
+	output:
+		fig = 'figure/{samples}_gene1K_profile.png',
+		tab = 'matrix/{samples}_gene1K_profile.tab'
+	params:
+		conda = config['conda_path']		
+	shell:
+		"{params.conda}/plotProfile -m {input.mat} --perGroup --yAxisLabel 'Normalized read coverage' --colors darkred -out {output.fig} --outFileNameData {output.tab}"
+
+rule plotProfile_R:
+	input:
+		chip_sample = 'matrix/IP_{treat}_gene1K_profile.tab',
+		input_sample = 'matrix/Input_{treat}_gene1K_profile.tab'
+	output:
+		fig = 'figure/{treat}_gene1K_profile.pdf'
+	params:
+		Rscript = config['Rscript_path']
+	shell:
+		"{params.Rscript} script/plotProfile.R {input.chip_sample} {input.input_sample} {output.fig}"
+
+rule peakset_overlap:
+	input:
+		'RData/peak_{p}_dba.RData'
+	output:
+		pdf = 'figure/peak_{p}_{olp}_overlap.pdf',
+		peak = 'peak_{p}/{olp}_consensusPeaks.bed',
+		submit = 'peak_{p}/{olp}_consensusSubmits.bed',
+		peak2 = 'peak_{p}/{olp}_any2Peaks.bed',
+		submit2 = 'peak_{p}/{olp}_any2Submits.bed'
+	params:
+		Rscript = config['Rscript_path']
+	shell:
+		'{params.Rscript} script/peakset_overlap.R {input} {output}'
+
+rule consensus_peak_anno:
+	input:
+		bed = 'peak_{p}/{olp}_consensusPeaks.bed'
+	output:
+		xls = 'peak_{p}/{olp}_consensusPeaks_anno.xls',
+		pie = 'peak_{p}/{olp}_consensusPeaks_annoPie.pdf'
+	params:
+		txdb = config['txdb'],
+		gene_anno = config['gene_anno'],
+		Rscript = config['Rscript_path']
+	shell:
+		"{params.Rscript} script/peak_anno.R {input} {params.txdb} {params.gene_anno} {output}"	
+
+rule any2_peak_anno:
+	input:
+		bed = 'peak_{p}/{olp}_any2Peaks.bed'
+	output:
+		xls = 'peak_{p}/{olp}_any2Peaks_anno.xls',
+		pie = 'peak_{p}/{olp}_any2Peaks_annoPie.pdf'
+	params:
+		txdb = config['txdb'],
+		gene_anno = config['gene_anno'],
+		Rscript = config['Rscript_path']
+	shell:
+		"{params.Rscript} script/peak_anno.R {input} {params.txdb} {params.gene_anno} {output}"	
+
+rule gene_overlap_H3K27me3:
+	input:
+		xls = 'peak_{p}/{treat}_peaks_anno.xls'
+	output:
+		olp = 'figure/{treat}_peak_{p}_targets_H3K27me3_overlap.pdf'
+	params:
+		Rscript = config['Rscript_path']
+	shell:
+		"{params.Rscript} script/gene_overlap_H3K27me3.R {input} {output}"	
+
+rule extend_submits:
+	input:
+		'peak_{p}/{olp}_consensusSubmits.bed'
+	output:
+		'meme-chip/{olp}_peak_{p}_consensusSubmits_1K_windown.bed'
+	params:
+		conda = config['conda_path'],
+		chromSize = config['chromSize']
+	shell:
+		"{params.conda}/bedtools slop -i {input} -b 500 -g {params.chromSize} > {output}"
+ 
+rule get_windows_fasta:
+	input:
+		'meme-chip/{olp}_peak_{p}_consensusSubmits_1K_windown.bed'
+	output:
+		'meme-chip/{olp}_peak_{p}_consensusSubmits_1K_windown.fa'
+	params:
+		conda = config['conda_path'],
+		fasta = config['fasta']
+	shell:
+		"{params.conda}/bedtools getfasta -fi {params.fasta} -bed {input} -name -fo {output}"
+ 
+rule repeatmasker:
+	input:
+		'meme-chip/{olp}_peak_{p}_consensusSubmits_1K_windown.fa'
+	output:
+		'meme-chip/{olp}_peak_{p}_consensusSubmits_1K_windown.fa.masked'
+	params:
+		RepeatMasker = config['RepeatMasker']	
+	shell:
+		"{params.RepeatMasker} -dir meme-chip {input}"
+ 
+rule meme_chip:
+	input:
+		'meme-chip/{olp}_peak_{p}_consensusSubmits_1K_windown.fa.masked'
+	output:
+		meme_dir = 'meme-chip/{olp}_peak_{p}_meme-chip',
+		meme_html = 'meme-chip/{olp}_peak_{p}_meme-chip/meme-chip.html'
+	params:
+		motif = config['motif']
+	shell:
+		'meme-chip -meme-p 16 -meme-maxw 10 -db {params.motif} -oc {output.meme_dir} {input}'
+
+rule load_data_for_any2Peaks:
+	input:
+		['bam/{sample}.bam'.format(sample=x) for x in config['samples']],
+		['peak_{p}/{olp}_any2Peaks.bed'.format(p=config['p'], olp=x) for x in config['olp']]
+	output:
+		sheet = 'sample_sheet_for_any2Peaks_peak_{p}.csv',
+		RData = 'RData/peak_{p}_dba_for_any2Peaks.RData'
+	params:
+		pvalue = config['p'],	
+		Rscript = config['Rscript_path']
+	shell:
+		"sed 's/$PEAK/peak_{params.pvalue}/' sample_sheet_for_any2Peaks.csv > {output.sheet}; "
+		"{params.Rscript} script/load_data_for_any2Peaks.R {output}"
+
+rule diff_test:
+	input:
+		'RData/peak_{p}_dba_for_any2Peaks.RData'
+	output:
+		'RData/peak_{p}_diff_test_for_any2Peaks.RData'
+	params:
+		mask = config['diff.mask'],
+		Rscript = config['Rscript_path']
+	shell:
+		'{params.Rscript}  script/diff_test.R {input} {params.mask} {output}'
+ 
+rule diff_test_anno:
+	input:
+		'RData/peak_{p}_diff_test_for_any2Peaks.RData'
+	output:
+		RData = 'RData/peak_{p}_diff_test_for_any2Peaks_anno.RData',
+		xlsx = 'table/peak_{p}_diff_test_for_any2Peaks_anno.xlsx',
+	params:
+		Rscript = config['Rscript_path'],
+		txdb = config['txdb'],
+		gene_anno = config['gene_anno']
+	shell:
+		'{params.Rscript}  script/diff_test_anno.R {input} {params.txdb} {output.RData} {output.xlsx}'
+ 
+rule MAnorm:
+	input:
+		peak1 = 'peak_{p}/{treat1}_c_{control1}_peaks.bed',
+		peak2 = 'peak_{p}/{treat2}_c_{control2}_peaks.bed',
+		read1 = 'MAnorm/{treat1}.bed',
+		read2 = 'MAnorm/{treat2}.bed'
+	output:
+		dir = 'MAnorm/{treat1}_c_{control1}_vs_{treat2}_c_{control2}_{p}',
+		xls = 'MAnorm/{treat1}_c_{control1}_vs_{treat2}_c_{control2}_{p}/_all_peak_MAvalues.xls'
+	shell:
+		"rm -r {output.dir}; MAnormFast --p1 {input.peak1} --r1 {input.read1} --p2 {input.peak2} --r2 {input.read2} -o {output.dir}"
+ 
+rule MAnorm_anno:
+	input:
+		'MAnorm/{treat1}_c_{control1}_vs_{treat2}_c_{control2}_{p}/_all_peak_MAvalues.xls'
+	output:
+		'MAnorm/{treat1}_c_{control1}_vs_{treat2}_c_{control2}_{p}/_all_peak_MAvalues.anno',
+		'MAnorm/{treat1}_c_{control1}_vs_{treat2}_c_{control2}_{p}/_all_peak_MAvalues.annoPie.pdf'
+	params:
+		txdb = config['txdb'],
+		gene_anno = config['gene_anno']
+	shell:
+		"Rscript script/peak_anno.R {input} {params} {output}"	
+ 
+rule merge_MAnorm_table:
+	input:
+		["MAnorm/{treat1}_c_{control1}_vs_{treat2}_c_{control2}_{p}/_all_peak_MAvalues.anno".format(treat1=x[0].split('_c_')[0], control1=x[0].split('_c_')[1], treat2=x[1].split('_c_')[0], control2=x[1].split('_c_')[1], p=config['p']) for x in zip(config['peak1'], config['peak2'])],
+	output:
+		'table/all_peak_{p}_MAvalues_anno.xlsx'
+	shell:
+		"Rscript script/merge_MAnorm_table.R config.yaml MAnorm {output}"	
+ 
+#rule report:
+#	input:
+#		rmd = 'doc/report.Rmd'
+#	output:
+#		html = 'doc/report.html'
+#	params:
+#		peak1 = config['samples'][0],
+#		peak2 = config['samples'][1]
+#	shell:
+#		"snakemake --config samples='{params.peak1}' treat='{params.peak1}' --dag | dot -Tsvg > doc/workflow.svg; "
+#		"Rscript script/make_report.R {input}"
+#		
