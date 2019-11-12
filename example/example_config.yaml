@@ -34,14 +34,14 @@ olp:
   - ING:1.2
   - WT:1.2
 
-#peak1: 
-#  - TYLCV-1_a-H3K27me3_c_TYLCV-1_Input
-# 
-#peak2: 
-#  - EV-1_a-H3K27me3_c_EV-1_Input
-# 
-#diff.mask:
-#  - H3K27me3-TYLCV,H3K27me3-EV^H3K27me3-TYLCV-C3mut,H3K27me3-EV^H3K27me3-TYLCV-C3mut,H3K27me3-TYLCV^H3-TYLCV,H3-EV^H3-TYLCV-C3mut,H3-EV^H3-TYLCV-C3mut,H3-TYLCV
+peak1: 
+  - TYLCV-1_a-H3K27me3_c_TYLCV-1_Input
+ 
+peak2: 
+  - EV-1_a-H3K27me3_c_EV-1_Input
+ 
+diff.mask:
+  - H3K27me3-TYLCV,H3K27me3-EV^H3K27me3-TYLCV-C3mut,H3K27me3-EV^H3K27me3-TYLCV-C3mut,H3K27me3-TYLCV^H3-TYLCV,H3-EV^H3-TYLCV-C3mut,H3-EV^H3-TYLCV-C3mut,H3-TYLCV
   
 cpu: 30
 
