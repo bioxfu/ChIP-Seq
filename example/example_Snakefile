@@ -24,10 +24,10 @@ rule all:
 		expand('figure/peak_{p}_correlation_heatmap_read_count.pdf', p=config['p']),
 		expand('RData/peak_{p}_dba.RData', p=config['p']),
 		expand('figure/peak_{p}_{olp}_overlap.pdf', p=config['p'], olp=config['olp']),
-		#expand('peak_{p}/{olp}_consensusPeaks_anno.xls', p=config['p'], olp=config['olp']),
-		#expand('peak_{p}/{olp}_consensusPeaks_annoPie.pdf', p=config['p'], olp=config['olp']),
-		#expand('peak_{p}/{olp}_any2Peaks_anno.xls', p=config['p'], olp=config['olp']),
-		#expand('peak_{p}/{olp}_any2Peaks_annoPie.pdf', p=config['p'], olp=config['olp']),
+		expand('peak_{p}/{olp}_consensusPeaks_anno.xls', p=config['p'], olp=config['olp']),
+		expand('peak_{p}/{olp}_consensusPeaks_annoPie.pdf', p=config['p'], olp=config['olp']),
+		expand('peak_{p}/{olp}_any2Peaks_anno.xls', p=config['p'], olp=config['olp']),
+		expand('peak_{p}/{olp}_any2Peaks_annoPie.pdf', p=config['p'], olp=config['olp']),
 		#expand('RData/peak_{p}_dba_for_any2Peaks.RData', p=config['p']),
 		
 		## Motif Analysis
@@ -120,8 +120,8 @@ rule bowtie2:
 		index = config['index'],
 		conda = config['conda_path']		
 	shell:
-		#"{params.conda}/bowtie2 -p {params.cpu} -x {params.index} -1 {input.r1} -2 {input.r2}|{params.conda}/samtools view -Sh -q 30 -F 4 -|grep -v 'XS:'|{params.conda}/samtools view -Shub|{params.conda}/samtools sort - -T {params.prefix} -o {output.bam}"
-		"{params.conda}/bowtie2 -p {params.cpu} -x {params.index} -1 {input.r1} -2 {input.r2}|{params.conda}/samtools view -Sh -F 4 -|{params.conda}/samtools view -Shub|{params.conda}/samtools sort - -T {params.prefix} -o {output.bam}"
+		"{params.conda}/bowtie2 -p {params.cpu} -x {params.index} -1 {input.r1} -2 {input.r2}|{params.conda}/samtools view -Sh -q 30 -F 4 -|grep -v 'XS:'|{params.conda}/samtools view -Shub|{params.conda}/samtools sort - -T {params.prefix} -o {output.bam}"
+		#"{params.conda}/bowtie2 -p {params.cpu} -x {params.index} -1 {input.r1} -2 {input.r2}|{params.conda}/samtools view -Sh -F 4 -|{params.conda}/samtools view -Shub|{params.conda}/samtools sort - -T {params.prefix} -o {output.bam}"
 
 rule bam_idx:
 	input:
