@@ -1,3 +1,1 @@
-mkdir results
-cp -r figure peak_* stat results
-tar -zcvf results.tar.gz results
+tar -zcvf results.tar.gz figure peak_* stat
