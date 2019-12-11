@@ -20,6 +20,13 @@ rule all:
 		['peak_{p}/{treat}_c_{control}_peaks.xls'.format(treat=x[0], control=x[1], p=config['p']) for x in zip(config['treat'], config['control'])],
 		['peak_{p}/{treat}_c_{control}_peaks_anno.xls'.format(treat=x[0], control=x[1], p=config['p']) for x in zip(config['treat'], config['control'])],
 		['peak_{p}/{treat}_c_{control}_peaks_annoPie.pdf'.format(treat=x[0], control=x[1], p=config['p']) for x in zip(config['treat'], config['control'])],
+
+		## If no Input sample
+		['peak_{p}/{treat}_no_input_peaks.bed'.format(treat=x, p=config['p']) for x in config['treat']],
+		['peak_{p}/{treat}_no_input_peaks.xls'.format(treat=x, p=config['p']) for x in config['treat']],
+		['peak_{p}/{treat}_no_input_peaks_anno.xls'.format(treat=x, p=config['p']) for x in config['treat']],
+		['peak_{p}/{treat}_no_input_peaks_annoPie.pdf'.format(treat=x, p=config['p']) for x in config['treat']],
+
 		expand('figure/peak_{p}_correlation_heatmap_peak_score.pdf', p=config['p']),
 		expand('figure/peak_{p}_correlation_heatmap_read_count.pdf', p=config['p']),
 		expand('RData/peak_{p}_dba.RData', p=config['p']),
@@ -228,6 +235,32 @@ rule peak_anno:
 	output:
 		xls = 'peak_{p}/{treat}_c_{control}_peaks_anno.xls',
 		pie = 'peak_{p}/{treat}_c_{control}_peaks_annoPie.pdf'
+	params:
+		txdb = config['txdb'],
+		gene_anno = config['gene_anno'],
+		Rscript = config['Rscript_path']
+	shell:
+		"{params.Rscript} script/peak_anno.R {input} {params.txdb} {params.gene_anno} {output}"	
+
+rule macs14_no_input:
+	input:
+		treat = 'bam/{treat}.bam',
+	output:
+		bed = 'peak_{p}/{treat}_no_input_peaks.bed',
+		xls = 'peak_{p}/{treat}_no_input_peaks.xls'
+	params:
+		gsize = config['gsize'],
+		pvalue = config['p'],
+		prefix = 'peak_{p}/{treat}_no_input'
+	shell:
+		'macs14 -t {input.treat} -g {params.gsize} -p {params.pvalue} -n {params.prefix} --nomodel'
+
+rule peak_anno_no_input:
+	input:
+		bed = 'peak_{p}/{treat}_no_input_peaks.bed'
+	output:
+		xls = 'peak_{p}/{treat}_no_input_peaks_anno.xls',
+		pie = 'peak_{p}/{treat}_no_input_peaks_annoPie.pdf'
 	params:
 		txdb = config['txdb'],
 		gene_anno = config['gene_anno'],
