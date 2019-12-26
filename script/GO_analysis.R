@@ -2,7 +2,9 @@ library(pheatmap)
 library(RColorBrewer)
 source('script/topGO.R')
 
-folder <- 'peak_1e-2'
+argv <- commandArgs(T)
+
+folder <- argv[1]
 
 input <- dir(folder, pattern='_anno.xls')
 

@@ -86,3 +86,10 @@ snakemake --unlock
 ./clean.sh
 ```
 
+
+### GO analysis of target genes
+```
+/cluster/home/xfu/R/3.5.1/bin/Rscript script/GO_analysis.R peak_1e-2
+```
+
+
